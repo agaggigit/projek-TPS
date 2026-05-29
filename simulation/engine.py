@@ -126,15 +126,16 @@ def run_all_scenarios() -> pd.DataFrame:
     """
     Run the 5 defined scenarios and return a DataFrame with results.
     """
-    # Note: These parameters (lam, mu) are placeholders. 
-    # You should update them based on your actual data from the 'analysis' phase.
-    # Unit assumption: vehicles per minute, duration in minutes (e.g., 60 mins)
+    # Data disesuaikan dari 01_statistik_deskriptif.ipynb
+    # Asumsi satuan waktu adalah detik. Durasi simulasi = 3600 detik (1 jam)
+    # CATATAN: Nilai mu di data Anda (50.42, 55.05) adalah Waktu Pelayanan (detik).
+    # Sedangkan engine ini membutuhkan Service Rate (kendaraan/detik), sehingga mu = 1 / Waktu_Pelayanan.
     scenarios = [
-        {'id': 'S1', 'desc': 'Sesi 2 (Sore peak)', 'lam': 2.0, 'mu': 0.8, 'c': 4, 'duration': 120},
-        {'id': 'S2', 'desc': 'Sesi 3 (Malam peak)', 'lam': 3.5, 'mu': 0.8, 'c': 4, 'duration': 120},
-        {'id': 'S3', 'desc': 'Sesi 4 (Malam sepi)', 'lam': 0.5, 'mu': 0.8, 'c': 4, 'duration': 120},
-        {'id': 'S4', 'desc': 'Hipotetis: Sesi 3 + 1 Nozzle', 'lam': 3.5, 'mu': 0.8, 'c': 5, 'duration': 120},
-        {'id': 'S5', 'desc': 'Hipotetis: Sesi 3 (Event Sudirman, lambda +50%)', 'lam': 3.5 * 1.5, 'mu': 0.8, 'c': 4, 'duration': 120}
+        {'id': 'S1', 'desc': 'Sesi 2 (Sore peak)', 'lam': 0.019231, 'mu': 0.019833, 'c': 1, 'duration': 3600},
+        {'id': 'S2', 'desc': 'Sesi 3 (Malam peak)', 'lam': 0.019558, 'mu': 0.018165, 'c': 1, 'duration': 3600},
+        {'id': 'S3', 'desc': 'Sesi 4 (Malam)', 'lam': 0.022660, 'mu': 0.021372, 'c': 1, 'duration': 3600},
+        {'id': 'S4', 'desc': 'Hipotetis: Sesi 3 + 1 Nozzle', 'lam': 0.019558, 'mu': 0.018165, 'c': 2, 'duration': 3600},
+        {'id': 'S5', 'desc': 'Hipotetis: Sesi 3 (Event Sudirman, lambda +50%)', 'lam': 0.019558 * 1.5, 'mu': 0.018165, 'c': 1, 'duration': 3600}
     ]
     
     results = []
@@ -168,11 +169,11 @@ def compare_with_empirical(sim_results_df: pd.DataFrame, empirical_data: dict = 
     Compare simulation results with empirical data.
     """
     if empirical_data is None:
-        # Example empirical data placeholder
+        # Data empiris dari notebook analisis
         empirical_data = {  
-            'S1': {'Wq (Emp)': 2.5, 'Lq (Emp)': 4.2},
-            'S2': {'Wq (Emp)': 5.1, 'Lq (Emp)': 8.5},
-            'S3': {'Wq (Emp)': 0.2, 'Lq (Emp)': 0.1},
+            'S1': {'Wq (Emp)': 264.50, 'Lq (Emp)': 6.0},
+            'S2': {'Wq (Emp)': 515.24, 'Lq (Emp)': 11.92},
+            'S3': {'Wq (Emp)': 299.39, 'Lq (Emp)': 6.33},
         }
     
     # Map empirical data to simulation results
@@ -210,7 +211,8 @@ if __name__ == "__main__":
     df_comparison = compare_with_empirical(df_results)
     print(df_comparison[['Scenario', 'Wq (Sim)', 'Wq (Emp)', 'Diff_Wq', 'Lq (Sim)', 'Lq (Emp)', 'Diff_Lq']].to_string(index=False))
     
-    # Example to plot a single run for S2
-    print("\nMembuat plot timeline untuk Skenario 2 (Malam Peak)...")
-    res_s2 = run_simulation(lam=3.5, mu=0.8, c=4, duration=120)
+    print("\nMembuat plot timeline untuk contoh Skenario 2 (Malam Peak)...")
+    # Menggunakan parameter asli S2
+    res_s2 = run_simulation(lam=0.019558, mu=0.018165, c=1, duration=3600)
     plot_timeline(res_s2['timeline'], title="Skenario 2 - Malam Peak")
+    print("Selesai! Tutup jendela grafik untuk mengakhiri program.")

@@ -40,3 +40,18 @@ generate_interarrival / generate_service   ← buat duluan, paling simple
         │
         ▼
     compare_with_empirical()               ← bandingkan dengan data nyata
+
+---
+
+## 🗃️ Alur Pengambilan Data (Data Flow)
+
+Parameter yang digunakan dalam simulasi ini (`λ`, `μ`, `Lq`, `Wq`) **tidak dibuat secara sembarangan**, melainkan diekstrak langsung dari hasil analisis statistik data riil.
+
+1. **Sumber Data:** Nilai-nilai empiris di-generate oleh file notebook `analysis/01_statistik_deskriptif.ipynb`.
+2. **Pemetaan Parameter:**
+   - `λ (Arrival Rate)` pada notebook dimasukkan ke parameter `lam` pada tiap skenario.
+   - `μ (Service Rate)` pada notebook dimasukkan ke parameter `mu` (dengan konversi `1 / Rata-rata Waktu Pelayanan`).
+   - `Lq` (Panjang Antrian) dan `Wq` (Waktu Tunggu) dari notebook digunakan sebagai **Data Empiris (Emp)** di fungsi `compare_with_empirical()` untuk mengukur tingkat akurasi (error) simulasi terhadap kenyataan.
+3. **Penyisipan ke Engine:** Data-data tersebut di-*hardcode* di dalam *dictionary* `scenarios` dan `empirical_data` pada `simulation/engine.py`. 
+
+*(Jika di masa depan ada update data mentah baru, Anda hanya perlu menjalankan ulang notebook `01`, lalu meng-update angka-angkanya ke dalam fungsi `run_all_scenarios` di `engine.py`)*.
