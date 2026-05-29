@@ -1,0 +1,1 @@
+Folder ini isinya buat nyimpen data mentah csv
