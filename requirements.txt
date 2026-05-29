@@ -1,0 +1,24 @@
+# ============================================================
+# Projek TPS — Simulasi Antrian SPBU
+# File ini berisi semua library Python yang dibutuhkan
+# Install dengan: pip install -r requirements.txt
+# ============================================================
+
+# --- Analisis & Statistik ---
+pandas>=3.0.0
+numpy>=2.0.0
+scipy>=1.17.0
+
+# --- Visualisasi ---
+matplotlib>=3.10.0
+seaborn>=0.13.0
+
+# --- Jupyter Notebook ---
+jupyter>=1.0.0
+ipykernel>=7.0.0
+
+# --- Aplikasi Streamlit ---
+streamlit>=1.40.0
+
+# --- Simulasi Antrian ---
+simpy>=4.1.0
