@@ -469,10 +469,12 @@ def build_animation_html(results, num_nozzles, simulation_time, rejected_count):
     const marking = new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.7 });
     const pumpGreen = new THREE.MeshStandardMaterial({ color: 0x16a34a, roughness: 0.6 });
     const pumpDark = new THREE.MeshStandardMaterial({ color: 0x14532d, roughness: 0.6 });
-    const red = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.55 });
     const black = new THREE.MeshStandardMaterial({ color: 0x111827, roughness: 0.8 });
     const metal = new THREE.MeshStandardMaterial({ color: 0x9ca3af, roughness: 0.45, metalness: 0.35 });
     const white = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.65 });
+    const tireMaterial = new THREE.MeshStandardMaterial({ color: 0x020617, roughness: 0.82 });
+    const glassMaterial = new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.25, metalness: 0.05 });
+    const lampMaterial = new THREE.MeshStandardMaterial({ color: 0xfef3c7, roughness: 0.35 });
 
     function addBox(width, height, depth, x, y, z, material, castShadow = false) {
       const mesh = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), material);
@@ -547,37 +549,112 @@ def build_animation_html(results, num_nozzles, simulation_time, rejected_count):
 
     function createMotor(id) {
       const group = new THREE.Group();
+      const motorShell = new THREE.Group();
+      motorShell.scale.set(0.68, 0.68, 0.68);
+      motorShell.position.y = 0.04;
+      group.add(motorShell);
 
-      const body = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.28, 0.36), red);
-      body.position.set(0, 0.48, 0);
-      body.castShadow = true;
-      group.add(body);
+      const numericId = Number(id) || 0;
+      const paintColor = new THREE.Color().setHSL((numericId * 0.61803398875) % 1, 0.78, 0.48);
+      const paint = new THREE.MeshStandardMaterial({ color: paintColor, roughness: 0.48, metalness: 0.08 });
 
-      const seat = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.18, 0.32), black);
-      seat.position.set(-0.16, 0.72, 0);
-      seat.castShadow = true;
-      group.add(seat);
+      const rearWheelX = -0.56;
+      const frontWheelX = 0.62;
+      const wheelY = 0.24;
+      const wheelZ = 0;
+      const wheelRadius = 0.26;
 
-      const front = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.45, 0.16), metal);
-      front.position.set(0.48, 0.62, 0);
-      front.rotation.z = -0.3;
-      front.castShadow = true;
-      group.add(front);
+      const tireGeometry = new THREE.TorusGeometry(wheelRadius, 0.055, 12, 36);
+      const rimGeometry = new THREE.CylinderGeometry(0.115, 0.115, 0.08, 28);
+      [rearWheelX, frontWheelX].forEach((x) => {
+        const tire = new THREE.Mesh(tireGeometry, tireMaterial);
+        tire.position.set(x, wheelY, wheelZ);
+        tire.castShadow = true;
+        motorShell.add(tire);
 
-      const wheelGeometry = new THREE.CylinderGeometry(0.18, 0.18, 0.12, 24);
-      const wheelPositions = [
-        [-0.38, 0.2, -0.2],
-        [0.38, 0.2, -0.2],
-        [-0.38, 0.2, 0.2],
-        [0.38, 0.2, 0.2],
-      ];
-      wheelPositions.forEach(([x, y, z]) => {
-        const wheel = new THREE.Mesh(wheelGeometry, black);
-        wheel.position.set(x, y, z);
-        wheel.rotation.x = Math.PI / 2;
-        wheel.castShadow = true;
-        group.add(wheel);
+        const rim = new THREE.Mesh(rimGeometry, metal);
+        rim.position.set(x, wheelY, wheelZ);
+        rim.rotation.x = Math.PI / 2;
+        rim.castShadow = true;
+        motorShell.add(rim);
       });
+
+      const frame = new THREE.Mesh(new THREE.BoxGeometry(0.96, 0.07, 0.08), black);
+      frame.position.set(0.0, 0.49, 0);
+      frame.rotation.z = 0.08;
+      frame.castShadow = true;
+      motorShell.add(frame);
+
+      const tank = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.24, 0.24), paint);
+      tank.position.set(0.08, 0.67, 0);
+      tank.rotation.z = -0.08;
+      tank.castShadow = true;
+      motorShell.add(tank);
+
+      const rearFairing = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.18, 0.22), paint);
+      rearFairing.position.set(-0.38, 0.62, 0);
+      rearFairing.rotation.z = 0.18;
+      rearFairing.castShadow = true;
+      motorShell.add(rearFairing);
+
+      const frontFairing = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.22, 0.2), paint);
+      frontFairing.position.set(0.48, 0.68, 0);
+      frontFairing.rotation.z = -0.25;
+      frontFairing.castShadow = true;
+      motorShell.add(frontFairing);
+
+      const seat = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.1, 0.25), black);
+      seat.position.set(-0.24, 0.81, 0);
+      seat.rotation.z = -0.08;
+      seat.castShadow = true;
+      motorShell.add(seat);
+
+      const fork = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.58, 12), metal);
+      fork.position.set(0.55, 0.52, 0);
+      fork.rotation.z = -0.35;
+      fork.castShadow = true;
+      motorShell.add(fork);
+
+      const rearArm = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.58, 12), metal);
+      rearArm.position.set(-0.42, 0.43, 0);
+      rearArm.rotation.z = 1.08;
+      rearArm.castShadow = true;
+      motorShell.add(rearArm);
+
+      const handlebar = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.52, 12), black);
+      handlebar.position.set(0.72, 0.93, 0);
+      handlebar.rotation.x = Math.PI / 2;
+      handlebar.rotation.z = -0.1;
+      handlebar.castShadow = true;
+      motorShell.add(handlebar);
+
+      const windshield = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.18, 0.18), glassMaterial);
+      windshield.position.set(0.65, 0.84, 0);
+      windshield.rotation.z = -0.38;
+      windshield.castShadow = true;
+      motorShell.add(windshield);
+
+      const headlamp = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 12), lampMaterial);
+      headlamp.position.set(0.68, 0.7, 0);
+      headlamp.scale.set(1, 0.7, 0.75);
+      headlamp.castShadow = true;
+      motorShell.add(headlamp);
+
+      const tailLamp = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.08, 0.14), new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.35 }));
+      tailLamp.position.set(-0.62, 0.64, 0);
+      tailLamp.castShadow = true;
+      motorShell.add(tailLamp);
+
+      const riderBody = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.11, 0.38, 16), new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.65 }));
+      riderBody.position.set(-0.08, 1.0, 0);
+      riderBody.rotation.z = -0.22;
+      riderBody.castShadow = true;
+      motorShell.add(riderBody);
+
+      const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.11, 18, 14), paint);
+      helmet.position.set(0.0, 1.25, 0);
+      helmet.castShadow = true;
+      motorShell.add(helmet);
 
       const label = makeTextSprite(`#${id}`);
       label.position.set(0, 1.25, 0);
