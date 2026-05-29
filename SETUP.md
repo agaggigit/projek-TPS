@@ -101,7 +101,18 @@ Buka file → Pilih kernel Python 3.x → Run All Cells
 
 ---
 
-## Langkah 6 — Jalankan Aplikasi Streamlit
+## Langkah 6 — Uji Coba Engine Simulasi (Opsional)
+
+Jika Anda ingin melihat hasil simulasi murni beserta grafik *timeline* antriannya langsung dari terminal tanpa membuka web app, Anda bisa mengeksekusi *engine* simulasi secara langsung:
+
+```bash
+python simulation/engine.py
+```
+Ini akan mencetak tabel hasil komparasi di terminal dan memunculkan grafik Matplotlib.
+
+---
+
+## Langkah 7 — Jalankan Aplikasi Streamlit
 
 Setelah analisis selesai, jalankan aplikasi interaktif simulasi antrian:
 
