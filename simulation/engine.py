@@ -42,7 +42,7 @@ def monitor_queue(env, gas_station, timeline, interval=1.0):
         timeline.append({'time': env.now, 'queue_length': len(gas_station.put_queue)})
         yield env.timeout(interval)
 
-def customer(env, name, gas_station, mu, service_dist, metrics):
+def customer(env, customer_id, gas_station, available_nozzles, mu, service_dist, metrics, customer_log):
     """
     Process for a single customer.
     """
@@ -52,9 +52,14 @@ def customer(env, name, gas_station, mu, service_dist, metrics):
         # Wait in queue until a nozzle is available
         yield request
         
-        wait_time = env.now - arrival_time
+        service_start = env.now
+        wait_time = service_start - arrival_time
         metrics['wait_times'].append(wait_time)
         metrics['queue_lengths'].append(len(gas_station.put_queue))
+        
+        # Determine specific nozzle ID
+        available_nozzles.sort()
+        nozzle_id = available_nozzles.pop(0) if available_nozzles else 0
         
         # Determine service time
         service_time = generate_service(mu, service_dist)
@@ -64,8 +69,22 @@ def customer(env, name, gas_station, mu, service_dist, metrics):
         
         # Being served
         yield env.timeout(service_time)
+        
+        depart_time = env.now
+        
+        # Return nozzle
+        available_nozzles.append(nozzle_id)
+        
+        # Log customer details for animation
+        customer_log.append({
+            "id": customer_id,
+            "t_arrive": float(arrival_time),
+            "t_service_start": float(service_start),
+            "t_depart": float(depart_time),
+            "nozzle": nozzle_id
+        })
 
-def arrival_generator(env, gas_station, lam, mu, interarrival_dist, service_dist, metrics):
+def arrival_generator(env, gas_station, available_nozzles, lam, mu, interarrival_dist, service_dist, metrics, customer_log):
     """ 
     Spawns customers based on the interarrival distribution.
     """
@@ -74,7 +93,7 @@ def arrival_generator(env, gas_station, lam, mu, interarrival_dist, service_dist
         interarrival_time = generate_interarrival(lam, interarrival_dist)
         yield env.timeout(interarrival_time)
         customer_id += 1
-        env.process(customer(env, f'Customer_{customer_id}', gas_station, mu, service_dist, metrics))
+        env.process(customer(env, customer_id, gas_station, available_nozzles, mu, service_dist, metrics, customer_log))
 
 def run_simulation(lam, mu, c, duration, interarrival_dist="exponential", service_dist="exponential"):
     """
@@ -82,6 +101,7 @@ def run_simulation(lam, mu, c, duration, interarrival_dist="exponential", servic
     """
     env = simpy.Environment()
     gas_station = simpy.Resource(env, capacity=c)
+    available_nozzles = list(range(c))
     
     # Store metrics for this run
     metrics = {
@@ -90,9 +110,10 @@ def run_simulation(lam, mu, c, duration, interarrival_dist="exponential", servic
         'server_busy_time': 0.0
     }
     timeline = []
+    customer_log = []
     
     # Start processes
-    env.process(arrival_generator(env, gas_station, lam, mu, interarrival_dist, service_dist, metrics))
+    env.process(arrival_generator(env, gas_station, available_nozzles, lam, mu, interarrival_dist, service_dist, metrics, customer_log))
     env.process(monitor_queue(env, gas_station, timeline, interval=1.0))
     
     # Run simulation
@@ -119,7 +140,8 @@ def run_simulation(lam, mu, c, duration, interarrival_dist="exponential", servic
         'Lq': avg_lq,
         'rho': rho,
         'total_customers_served': num_customers,
-        'timeline': timeline
+        'timeline': timeline,
+        'customer_log': customer_log
     }
 
 def run_all_scenarios() -> pd.DataFrame:

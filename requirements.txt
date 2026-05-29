@@ -17,8 +17,9 @@ seaborn>=0.13.0
 jupyter>=1.0.0
 ipykernel>=7.0.0
 
-# --- Aplikasi Streamlit ---
+# --- Aplikasi Streamlit & Animasi ---
 streamlit>=1.40.0
+plotly>=5.0.0
 
 # --- Simulasi Antrian ---
 simpy>=4.1.0
