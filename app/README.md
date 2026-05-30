@@ -1,36 +1,23 @@
 # ⛽ Web App Simulasi Antrian SPBU
 
-Direktori ini berisi kode sumber untuk antarmuka pengguna interaktif (berbasis [Streamlit](https://streamlit.io/)) yang berfungsi sebagai dasbor simulasi.
+Direktori ini berisi kode sumber untuk antarmuka pengguna interaktif berbasis [Streamlit](https://streamlit.io/) yang berfungsi sebagai dasbor simulasi antrian.
 
 ## 📂 Struktur Direktori
 
-- `streamlit_app.py`: Titik masuk utama aplikasi (Main Entry Point). Menghubungkan engine simulasi, sidebar, chart, dan animasi 2D.
-- `scenarios.py`: Berisi preset parameter/skenario simulasi (contoh: Sesi Sibuk, Sesi Sepi) yang dapat dipilih pengguna.
-- `components/`: Kumpulan modul UI untuk mempermudah pembacaan kode.
-  - `sidebar.py`: Panel kontrol di sebelah kiri untuk mengatur $\lambda$, $\mu$, dan konfigurasi lainnya.
-  - `charts.py`: Visualisasi metrik KPI dan grafik antrian dinamis menggunakan Plotly.
-  - `animation.py`: *Wrapper* Python untuk menanamkan animasi HTML ke dalam antarmuka Streamlit.
-  - `animation_2d.html`: *Engine* visualisasi utama berbasis HTML5 Canvas dan JavaScript. Merender denah SPBU beserta lalu lintas motor dengan 60FPS.
+Kode aplikasi telah dirapikan (di-refactor) menjadi arsitektur berbasis komponen agar lebih mudah dipelihara:
+
+- `streamlit_app.py`: Titik masuk utama aplikasi (Main Entry Point). Bertanggung jawab me-load data observasi (`load_observation_data`), memanggil engine simulasi, dan merender komponen UI.
+- `components/`: Kumpulan modul UI terpisah:
+  - `sidebar.py`: Panel kontrol di sebelah kiri untuk mengatur kedatangan (Arrival Rate), Durasi, Jumlah Nozzle, dan Seed.
+  - `charts.py`: Menyediakan fungsi untuk me-render metrik KPI (Wq, Lq, Utilisasi), grafik antrian dinamis menggunakan Plotly/Streamlit Line Chart, dan analisis sensitivitas.
+  - `animation.py`: *Wrapper* Python untuk menanamkan animasi HTML 3D (menggunakan **Three.js**) ke dalam antarmuka Streamlit. Merender denah SPBU beserta pergerakan motor secara dinamis.
 
 ## 🚀 Fitur Utama
 
-1. **Konfigurasi Real-time**: Mengubah tingkat kedatangan ($\lambda$), tingkat pelayanan ($\mu$), dan jumlah pompa secara dinamis dari sidebar.
-2. **Kalkulasi Engine**: Menjalankan *script* `simulation/engine.py` secara asinkron setiap kali simulasi dijalankan.
-3. **Analisis Metrik**: Tabel komprehensif menampilkan $W_q$, $L_q$, $\rho$, dan tren riwayat waktu mengantri.
-4. **Animasi 2D Interaktif**: Visualisasi nyata bagaimana motor masuk, antri, dilayani di setiap *island*, lalu pergi meninggalkan SPBU. Animasi dapat dipercepat atau diperlambat melalui slider HUD.
-
-## 🎨 Modifikasi Asset Animasi
-
-Secara *default*, animasi `animation_2d.html` merender motor dan pompa sebagai bentuk geometris (kotak warna-warni). Anda dapat menggantinya dengan gambar (PNG/JPG) Anda sendiri.
-
-Cara mengganti:
-1. Buka `app/components/animation_2d.html`
-2. Cari bagian **KONFIGURASI ASSET** di baris atas kode JavaScript.
-3. Ganti nilai `null` dengan path relatif atau URL gambar Anda, contoh:
-   ```javascript
-   const ASSET_VEHICLE = 'http://localhost:8000/motor.png';
-   const ASSET_BACKGROUND = 'http://localhost:8000/denah_spbu_custom.jpg';
-   ```
+1. **Pemodelan Data Dinamis**: Menarik parameter langsung dari file *raw data* observasi secara otomatis.
+2. **Kalkulasi Engine SimPy**: Menggunakan `run_mg1_simulation` dari modul `simulation/engine.py` untuk mensimulasikan antrian sesuai parameter.
+3. **Analisis Metrik & Sensitivitas**: Menyajikan performa antrian dan membandingkan 3 skenario berbeda (Sepi, Normal, Ramai) dalam tabel ringkas.
+4. **Animasi 3D Interaktif**: Visualisasi *real-time* (Three.js) yang dapat dimainkan (play/pause/scrub) untuk melihat pergerakan historis motor di dalam sistem antrian.
 
 ## 🛠️ Cara Menjalankan
 

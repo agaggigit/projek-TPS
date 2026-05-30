@@ -1,18 +1,19 @@
-# ⛽ Projek Pemodelan dan Simulasi (TPS) — Antrian SPBU
+# ⛽ Projek Pemodelan dan Simulasi (TPS) — Antrian SPBU Pertamax Motor
 
-Proyek ini adalah simulasi sistem antrian pada Stasiun Pengisian Bahan Bakar Umum (SPBU) menggunakan pemodelan matematika **M/M/c** (atau adaptasinya) yang diimplementasikan dalam Python.
+Proyek ini adalah simulasi sistem antrian pada Stasiun Pengisian Bahan Bakar Umum (SPBU) menggunakan pendekatan **M/G/1** yang diimplementasikan dengan **SimPy** dan disajikan dalam dasbor interaktif berbasis **Streamlit** beserta animasi **3D**.
 
 ## 🎯 Tujuan Proyek
-- Menghitung dan menganalisis metrik performa antrian seperti $W_q$ (waktu tunggu antrian), $L_q$ (panjang antrian), dan $\rho$ (utilisasi pompa).
-- Menguji kecocokan distribusi data empiris.
-- Menyediakan Dasbor Interaktif berbasis Streamlit lengkap dengan **Animasi 2D Top-Down** untuk memvisualisasikan lalu lintas kendaraan di SPBU secara *real-time*.
+- Menghitung dan menganalisis metrik performa antrian riil seperti $W_q$ (waktu tunggu), $L_q$ (panjang antrian), dan $\rho$ (utilisasi server/nozzle).
+- Melakukan *Discrete-Event Simulation* menggunakan library SimPy untuk mendapatkan estimasi yang mendekati kenyataan.
+- Menyediakan Dasbor Interaktif yang memvisualisasikan lalu lintas antrian motor SPBU secara 3D (Three.js).
 
-## 📂 Struktur Utama
+## 📂 Struktur Repositori
 
-- **`analysis/`**: Jupyter Notebook untuk pemrosesan data historis dan uji *goodness-of-fit* (Eksponensial/Normal).
-- **`simulation/`**: *Engine* berbasis **SimPy** yang melakukan kalkulasi *discrete-event simulation* dan pelacakan historis setiap *customer*.
-- **`app/`**: Dasbor web Streamlit yang mencakup antarmuka parameter, grafik Plotly, dan kanvas animasi HTML5.
+- **`analysis/`**: Jupyter Notebook untuk pemrosesan data historis dan pengujian kecocokan distribusi.
+- **`app/`**: Dasbor web Streamlit, mencakup UI komponen terpisah (sidebar, chart) dan animasi 3D.
+- **`data/`**: Direktori untuk menyimpan data mentah observasi (CSV) serta *log* hasil simulasi.
+- **`simulation/`**: Mesin (engine) simulasi *discrete-event* berbasis `simpy` yang memodelkan antrian secara matematis.
 
 ## 🚀 Memulai
 
-Untuk panduan instalasi lengkap, prasyarat, dan cara menjalankan aplikasi, silakan baca **[SETUP.md](SETUP.md)**.
+Untuk panduan instalasi lengkap, prasyarat lingkungan, dan cara menjalankan aplikasi, silakan baca **[SETUP.md](SETUP.md)**.
